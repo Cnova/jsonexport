@@ -84,6 +84,7 @@ var Parser = function () {
     value: function _parseArray(json, stream) {
       var self = this;
       this._headers = this._headers || [];
+      var normalizedHeaders = [];
       var fileRows = [];
       var outputFile = void 0;
       var fillRows = void 0;
@@ -93,6 +94,15 @@ var Parser = function () {
         if (index === -1) {
           self._headers.push(header);
           index = self._headers.indexOf(header);
+        }
+        return index;
+      };
+
+      var getNormalizedIndex = function getNormalizedIndex(header) {
+        var index = normalizedHeaders.indexOf(header);
+        if (index === -1) {
+          normalizedHeaders.push(header);
+          index = normalizedHeaders.indexOf(header);
         }
         return index;
       };
@@ -111,6 +121,7 @@ var Parser = function () {
         };
         var emptyRowIndexByHeader = {};
         var currentRow = newRow();
+        var lastIndex = -1;
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
@@ -120,11 +131,13 @@ var Parser = function () {
             var element = _step2.value;
 
             var elementHeaderIndex = getHeaderIndex(element.item);
-            if (currentRow[elementHeaderIndex] != undefined) {
+            var normalizedIndex = getNormalizedIndex(element.item);
+            if (currentRow[elementHeaderIndex] != undefined || normalizedIndex < lastIndex) {
               fillAndPush(currentRow);
               currentRow = newRow();
             }
             emptyRowIndexByHeader[elementHeaderIndex] = emptyRowIndexByHeader[elementHeaderIndex] || 0;
+            lastIndex = normalizedIndex;
             // make sure there isn't a empty row for this header
             if (self._options.fillTopRow && emptyRowIndexByHeader[elementHeaderIndex] < rows.length) {
               rows[emptyRowIndexByHeader[elementHeaderIndex]][elementHeaderIndex] = self._escape(element.value);

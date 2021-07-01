@@ -17,6 +17,7 @@ var Handler = function () {
 
     // an object of {typeName:(value,index,parent)=>any}
     this._options.typeHandlers = this._options.typeHandlers || {};
+    this._headers = [];
   }
 
   /**
@@ -148,6 +149,22 @@ var Handler = function () {
       var self = this;
       var result = [];
       var firstElementWithoutItem;
+
+      var getHeaderIndex = function getHeaderIndex(item) {
+        var index = self._headers.indexOf(item);
+        if (index === -1) {
+          if (item === null) {
+            self._headers.unshift(item);
+          } else {
+            self._headers.push(item);
+          }
+          index = self._headers.indexOf(item);
+        }
+        return index;
+      };
+      var sortByHeaders = function sortByHeaders(itemA, itemB) {
+        return getHeaderIndex(itemA.item) - getHeaderIndex(itemB.item);
+      };
       for (var aIndex = 0; aIndex < array.length; ++aIndex) {
         var element = array[aIndex];
         //Check the propData type
@@ -160,6 +177,27 @@ var Handler = function () {
           continue;
         } else if (resultCheckType.length > 0 && !firstResult.item && firstElementWithoutItem === undefined) {
           firstElementWithoutItem = firstResult;
+        }
+        var toSort = [];
+        for (var bIndex = 0; bIndex < resultCheckType.length; bIndex++) {
+          getHeaderIndex(resultCheckType[bIndex].item);
+          resultCheckType[bIndex]._depth = (resultCheckType[bIndex]._depth || 0) + 1;
+          if (resultCheckType[bIndex]._depth === 1) {
+            toSort.push(resultCheckType[bIndex]);
+          } else if (toSort.length > 0) {
+            var sorted = toSort.sort(sortByHeaders);
+            for (var cIndex = 0; cIndex < sorted.length; cIndex++) {
+              resultCheckType[bIndex - sorted.length + cIndex] = sorted[cIndex];
+            }
+            toSort = [];
+          }
+        }
+        if (toSort.length > 0) {
+          var _sorted = toSort.sort(sortByHeaders);
+          for (var _cIndex = 0; _cIndex < _sorted.length; _cIndex++) {
+            resultCheckType[resultCheckType.length - _sorted.length + _cIndex] = _sorted[_cIndex];
+          }
+          toSort = [];
         }
         //Append to results
         result = result.concat(resultCheckType);
