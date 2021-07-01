@@ -257,6 +257,127 @@ speed.min,5
 size,10;20
 ```
 
+### Complex JSON Array
+
+#### Code (fillGaps, fillTopRow = true)
+
+```javascript
+const jsonexport = require('jsonexport');
+
+const stats = [{
+                  manufacturer: 'BMW',
+                  country: 'USA',
+                  inventory: {
+                    profile: ['public'],
+                    cars: [
+                      {
+                        model: '3-series',
+                        price: '34850'
+                      },
+                      {
+                        model: '5-series',
+                        price: '55000'
+                      },
+                      {
+                        model: '7-series',
+                        price: '72000'
+                      }
+                    ]
+                  },
+                  category: [
+                    {
+                      sedan: [
+                        {
+                          seats: 4,
+                          doors: 4,
+                          sunroof: true
+                        }
+                      ]
+                    }
+                  ],
+                  location: {
+                    address: [
+                      {
+                        city: 'Raleigh',
+                        state: 'NC',
+                        dealer: 'Raleigh Motors'
+                      },
+                      {
+                        city: 'Durham',
+                        state: 'NC',
+                        dealer: 'Durham BMW'
+                      }
+                    ]
+                  }
+                },
+                {
+                  manufacturer: 'Audi',
+                  country: 'USA',
+                  inventory: {
+                    profile: ['public'],
+                    cars: [
+                      {
+                        model: 'Q3',
+                        price: '36700'
+                      },
+                      {
+                        model: 'Q5',
+                        price: '48900'
+                      },
+                      {
+                        model: 'Q7',
+                        price: '91350'
+                      }
+                    ]
+                  },
+                  category: [
+                    {
+                      sedan: [
+                        {
+                          seats: 7,
+                          doors: 4,
+                          sunroof: true,
+                          heatedSeats: 'front'
+                        }
+                      ]
+                    }
+                  ],
+                  location: {
+                    address: [
+                      {
+                        city: 'Greensboro',
+                        state: 'NC',
+                        dealer: 'Audi Greensboro'
+                      },
+                      {
+                        city: 'Asheville',
+                        state: 'NC',
+                        dealer: 'Asheville Audi Motors'
+                      }
+                    ]
+                  }
+                }
+              ];
+
+jsonexport(stats, {fillGaps: true, fillTopRow: true}, 
+    function(err, csv){
+    if(err) return console.error(err);
+    console.log(csv);
+});
+```
+
+#### Result
+
+```
+manufacturer,country,inventory.profile,inventory.cars.model,inventory.cars.price,category.sedan.seats,category.sedan.doors,category.sedan.sunroof,location.address.city,location.address.state,location.address.dealer,category.sedan.heatedSeats
+BMW,USA,public,3-series,34850,4,4,true,Raleigh,NC,Raleigh Motors
+BMW,USA,public,5-series,55000,4,4,true,Durham,NC,Durham BMW
+BMW,USA,public,7-series,72000,4,4,true,Durham,NC,Durham BMW
+Audi,USA,public,Q3,36700,7,4,true,Greensboro,NC,Audi Greensboro,front
+Audi,USA,public,Q5,48900,7,4,true,Asheville,NC,Asheville Audi Motors,front
+Audi,USA,public,Q7,91350,7,4,true,Asheville,NC,Asheville Audi Motors,front
+```
+
 ## Options
 
 In order to get the most of out of this module, you can customize many parameters and functions.

@@ -7,7 +7,6 @@ var {assert, expect} = require('chai');
 var jsonexport = require('../lib/index');
 var os = require('os');
 
-
 const isRemoteTest = process.env.APPVEYOR || process.env.TRAVIS;
 if( isRemoteTest ){
   console.log('\x1b[34mRemote testing server detected on '+os.type()+' '+os.platform()+' '+os.release()+'\x1b[0m');
@@ -100,7 +99,7 @@ describe('Object', () => {
           if(parent===contacts){
             return 'parentless-'+index;
           }
-          
+
           return value.toString();
         }
       }
@@ -121,9 +120,8 @@ describe('Object', () => {
       }
     ], {})
 
-    assert.equal(csv, `a,b,c,d,e\n0,,,1,this`)
+    assert.equal(csv, `a,b,c,d,e`+ os.EOL +`0,,,1,this`)
   });
-
   it('Date', async () => {
     const csv = await jsonexport([
       {

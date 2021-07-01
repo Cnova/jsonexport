@@ -127,9 +127,17 @@ var Parser = function () {
             emptyRowIndexByHeader[elementHeaderIndex] = emptyRowIndexByHeader[elementHeaderIndex] || 0;
             // make sure there isn't a empty row for this header
             if (self._options.fillTopRow && emptyRowIndexByHeader[elementHeaderIndex] < rows.length) {
+              // Fill gap between row's current length and elementHeaderIndex with ""
+              var rowGap = elementHeaderIndex - rows[emptyRowIndexByHeader[elementHeaderIndex]].length;
+              if (rowGap > 0) {
+                rows[emptyRowIndexByHeader[elementHeaderIndex]] = rows[emptyRowIndexByHeader[elementHeaderIndex]].concat(Array(rowGap).fill(""));
+              }
               rows[emptyRowIndexByHeader[elementHeaderIndex]][elementHeaderIndex] = self._escape(element.value);
               emptyRowIndexByHeader[elementHeaderIndex] += 1;
               continue;
+            }
+            if (currentRow.length < elementHeaderIndex) {
+              currentRow = currentRow.concat(Array(elementHeaderIndex - currentRow.length).fill(""));
             }
             currentRow[elementHeaderIndex] = self._escape(element.value);
             emptyRowIndexByHeader[elementHeaderIndex] += 1;
